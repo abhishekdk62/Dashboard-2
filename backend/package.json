@@ -24,7 +24,7 @@
   "scripts": {
     "dev": "nodemon --exec npx ts-node src/app.ts",
     "start": "node dist/app.js",
-    "build":"tsc"
+    "build": "tsc"
   },
   "devDependencies": {
     "@types/bcrypt": "^6.0.0",
