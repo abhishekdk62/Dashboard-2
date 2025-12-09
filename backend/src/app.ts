@@ -5,7 +5,7 @@ import http from "http";
 import dotenv from "dotenv";
 import sequelize from "./models";
 import routes from "./routes";
-import { initSockets } from "./sockets/ticket.sockets";
+import { initSocket } from "./sockets/ticket.sockets";
 
 dotenv.config();
 
@@ -22,7 +22,7 @@ app.use(express.json());
 app.use(cookieParser());
 app.use("/api", routes);
 
-initSockets(server);
+initSocket(server);
 
 (async () => {
   try {

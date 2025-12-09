@@ -6,6 +6,7 @@ import {
   updateTicketStatus,
   getAllTickets,
   addComment,
+  getAdminTicket,
 } from '../controllers/ticket.controller';
 import { authenticateToken, requireAdmin } from '../middleware/auth.middleware';
 
@@ -19,5 +20,6 @@ router.get('/:id', getTicket);
 router.patch('/:id', requireAdmin, updateTicketStatus);
 router.get('/', requireAdmin, getAllTickets);
 router.post('/:ticketId/comments', addComment);
+router.get('/admin/:id', requireAdmin, getAdminTicket);  // Admin sees ALL tickets
 
 export default router;

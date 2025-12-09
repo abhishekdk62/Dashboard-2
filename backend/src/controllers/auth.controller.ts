@@ -8,6 +8,8 @@ import { User } from "../models";
 const redisClient = createClient({
   url: process.env.REDIS_URL || "redis://localhost:6379",
 });
+console.log('redis',process.env.REDIS_URL);
+
 
 redisClient.connect();
 
