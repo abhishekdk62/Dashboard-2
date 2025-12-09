@@ -15,6 +15,7 @@ class User extends Model<UserAttributes> {
   declare email: string;
   declare role: 'user' | 'admin';
   declare name?: string;
+  declare password: string;
 }
 
 User.init(

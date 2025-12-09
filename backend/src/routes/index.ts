@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import authRoutes from './auth.routes';
 import ticketRoutes from './ticket.routes';
-import analyticsRoutes from '../controllers/analytics.controller';
+import analyticsRoutes from '../routes/analytic.routes';
 
 const router = Router();
 

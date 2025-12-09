@@ -2,11 +2,9 @@ import { Request, Response } from 'express';
 import { Ticket, Comment, User } from '../models';
 import { io } from '../sockets/ticket.sockets';
 
-interface AuthRequest extends Request {
-  user?: { id: number; email: string; role: 'user' | 'admin' };
-}
 
-export const getUserTickets = async (req: AuthRequest, res: Response) => {
+
+export const getUserTickets = async (req: Request, res: Response) => {
   const tickets = await Ticket.findAll({
     where: { userId: req.user!.id },
     order: [['createdAt', 'DESC']],
@@ -14,7 +12,7 @@ export const getUserTickets = async (req: AuthRequest, res: Response) => {
   res.json(tickets);
 };
 
-export const createTicket = async (req: AuthRequest, res: Response) => {
+export const createTicket = async (req: Request, res: Response) => {
   const ticket = await Ticket.create({
     ...req.body,
     userId: req.user!.id,
@@ -24,7 +22,7 @@ export const createTicket = async (req: AuthRequest, res: Response) => {
   res.status(201).json(ticket);
 };
 
-export const getTicket = async (req: AuthRequest, res: Response) => {
+export const getTicket = async (req: Request, res: Response) => {
   const ticket = await Ticket.findByPk(req.params.id, {
     include: [
       {
@@ -42,7 +40,7 @@ export const getTicket = async (req: AuthRequest, res: Response) => {
   res.json(ticket);
 };
 
-export const updateTicketStatus = async (req: AuthRequest, res: Response) => {
+export const updateTicketStatus = async (req: Request, res: Response) => {
   const { status } = req.body;
   const ticket = await Ticket.findByPk(req.params.id);
 
@@ -60,7 +58,7 @@ export const updateTicketStatus = async (req: AuthRequest, res: Response) => {
   res.json(ticket);
 };
 
-export const getAllTickets = async (req: AuthRequest, res: Response) => {
+export const getAllTickets = async (req: Request, res: Response) => {
   const tickets = await Ticket.findAll({
     include: [{ model: User }],
     order: [['createdAt', 'DESC']],
@@ -68,7 +66,7 @@ export const getAllTickets = async (req: AuthRequest, res: Response) => {
   res.json(tickets);
 };
 
-export const addComment = async (req: AuthRequest, res: Response) => {
+export const addComment = async (req: Request, res: Response) => {
   const { content } = req.body;
   const comment = await Comment.create({
     ticketId: +req.params.ticketId,

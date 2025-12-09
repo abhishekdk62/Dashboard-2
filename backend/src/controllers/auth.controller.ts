@@ -3,17 +3,15 @@ import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 import { User } from '../models';
 
-interface AuthRequest extends Request {
-  user?: { id: number; email: string; role: 'user' | 'admin' };
-}
 
-export const sendOtp = async (req: AuthRequest, res: Response) => {
+
+export const sendOtp = async (req: Request, res: Response) => {
   const { email } = req.body;
   // TODO: Implement actual OTP logic with Redis/Nodemailer
   res.json({ message: 'OTP sent', otp: '123456' }); // Demo OTP
 };
 
-export const verifyOtp = async (req: AuthRequest, res: Response) => {
+export const verifyOtp = async (req: Request, res: Response) => {
   const { email, otp } = req.body;
   // TODO: Verify OTP from Redis/cache
   if (otp === '123456') {
@@ -23,7 +21,7 @@ export const verifyOtp = async (req: AuthRequest, res: Response) => {
   }
 };
 
-export const completeRegistration = async (req: AuthRequest, res: Response) => {
+export const completeRegistration = async (req: Request, res: Response) => {
   try {
     const { name, email, password } = req.body;
     
@@ -32,7 +30,7 @@ export const completeRegistration = async (req: AuthRequest, res: Response) => {
       return res.status(400).json({ error: 'User already exists' });
     }
 
-    const user = await User.create({ name, email, password });
+    const user = await User.create({ name, email, password,role:'user' });
     
     const token = jwt.sign(
       { id: user.id },
@@ -53,7 +51,7 @@ export const completeRegistration = async (req: AuthRequest, res: Response) => {
   }
 };
 
-export const login = async (req: AuthRequest, res: Response) => {
+export const login = async (req: Request, res: Response) => {
   try {
     const { email, password } = req.body;
     
@@ -81,19 +79,18 @@ export const login = async (req: AuthRequest, res: Response) => {
   }
 };
 
-export const register = async (req: AuthRequest, res: Response) => {
-  // Same as completeRegistration for backward compatibility
+export const register = async (req: Request, res: Response) => {
   await completeRegistration(req as any, res);
 };
 
-export const getMe = async (req: AuthRequest, res: Response) => {
+export const getMe = async (req: Request, res: Response) => {
   const user = await User.findByPk(req.user!.id, {
     attributes: ['id', 'name', 'email', 'role'],
   });
   res.json(user);
 };
 
-export const logout = (req: AuthRequest, res: Response) => {
+export const logout = (req: Request, res: Response) => {
   res.clearCookie('token');
   res.json({ message: 'Logged out successfully' });
 };

@@ -2,12 +2,9 @@ import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import { User } from '../models';
 
-interface AuthRequest extends Request {
-  user?: { id: number; email: string; role: 'user' | 'admin' };
-}
 
 export const authenticateToken = async (
-  req: AuthRequest,
+  req: Request,
   res: Response,
   next: NextFunction
 ) => {
@@ -31,7 +28,7 @@ export const authenticateToken = async (
 };
 
 export const requireAdmin = (
-  req: AuthRequest,
+  req: Request,
   res: Response,
   next: NextFunction
 ) => {
