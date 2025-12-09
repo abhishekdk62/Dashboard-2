@@ -102,7 +102,7 @@ const Login: React.FC = () => {
       <div className="max-w-md w-full bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/50 p-8 space-y-6">
         <div className="text-center space-y-2">
           <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-            Peko Support
+            Dashboard Support
           </h1>
           <p className="text-gray-600">{isRegister ? 'Create Account' : 'Welcome Back'}</p>
         </div>
