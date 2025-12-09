@@ -7,6 +7,6 @@ const router = Router();
 
 router.use('/auth', authRoutes);
 router.use('/tickets', ticketRoutes);
-router.get('/analytics', analyticsRoutes);
+router.use('/analytics', analyticsRoutes);
 
 export default router;

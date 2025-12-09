@@ -26,25 +26,13 @@ initSockets(server);
 
 (async () => {
   try {
-    await sequelize.sync({ force: true });
-
-    const bcrypt = require("bcryptjs");
-
-    const UserModel = sequelize.models.User as any;
-    if (UserModel) {
-      await UserModel.create({
-        name: "Admin",
-        email: "admin@gmail.com",
-        password: bcrypt.hashSync("admin123", 12),
-        role: "admin",
-      });
-    }
-
-    console.log("Database synced & admin created");
+    await sequelize.sync();
+    console.log("Database synced");
   } catch (error) {
-    console.error(" DB sync failed:", error);
+    console.error("DB sync failed:", error);
   }
 })();
+
 
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => {

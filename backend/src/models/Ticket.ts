@@ -66,6 +66,5 @@ Ticket.init(
   }
 );
 
-Ticket.belongsTo(User, { foreignKey: 'userId' });
 
 export default Ticket;
