@@ -13,80 +13,7 @@ console.log('redis',process.env.REDIS_URL);
 
 redisClient.connect();
 
-const transporter = nodemailer.createTransport({
-  host: process.env.EMAIL_HOST || "smtp.gmail.com",
-  port: parseInt(process.env.EMAIL_PORT || "587"),
-  secure: false,
-  auth: {
-    user: process.env.EMAIL_USER!,
-    pass: process.env.EMAIL_PASS!,
-  },
-});
 
-// ✅ FIXED: Redis v4 + OTP Verification
-export const sendOtp = async (req: Request, res: Response) => {
-  try {
-    const { email } = req.body;
-
-    if (!email) {
-      return res.status(400).json({ error: "Email required" });
-    }
-
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
-
-    // ✅ REDIS v4: set with EX (expire seconds)
-    await redisClient.set(`otp:${email.toLowerCase()}`, otp, { EX: 600 });
-
-    await transporter.sendMail({
-      from: process.env.EMAIL_USER!,
-      to: email,
-      subject: "Dashboard Signup OTP",
-      text: `Dashboard signup OTP is: ${otp}`,
-    });
-
-    console.log(`OTP ${otp} sent to ${email}`);
-    res.json({ message: "OTP sent" });
-  } catch (error: any) {
-    console.error("OTP error:", error.message);
-    res.status(500).json({ error: "Failed to send OTP" });
-  }
-};
-
-// ✅ FIXED: Redis v4 + Set verification flag
-export const verifyOtp = async (req: Request, res: Response) => {
-  try {
-    const { email, otp } = req.body;
-
-    if (!email || !otp) {
-      return res.status(400).json({ error: "Email and OTP required" });
-    }
-
-    // ✅ REDIS v4: get
-    const storedOtp = await redisClient.get(`otp:${email.toLowerCase()}`);
-
-    if (!storedOtp) {
-      return res.status(400).json({ error: "OTP expired or not found" });
-    }
-
-    if (storedOtp !== otp) {
-      return res.status(400).json({ error: "Invalid OTP" });
-    }
-
-    // ✅ Delete OTP + Set verification flag (10min)
-    await redisClient.del(`otp:${email.toLowerCase()}`);
-    await redisClient.set(`verified:${email.toLowerCase()}`, "true", {
-      EX: 600,
-    });
-
-    console.log(`OTP verified for ${email}`);
-    res.json({ message: "OTP verified" });
-  } catch (error: any) {
-    console.error("Verify error:", error);
-    res.status(500).json({ error: "Verification failed" });
-  }
-};
-
-// ✅ FIXED: MANDATORY OTP check before registration
 export const completeRegistration = async (req: Request, res: Response) => {
   try {
     const { name, email, password } = req.body;
@@ -97,14 +24,7 @@ export const completeRegistration = async (req: Request, res: Response) => {
         .json({ error: "Name, email, and password (6+ chars) required" });
     }
 
-    // ✅ CRITICAL: Check OTP verification FIRST
-    const isVerified = await redisClient.get(`verified:${email.toLowerCase()}`);
-    if (!isVerified) {
-      return res.status(400).json({ error: "Please verify OTP first" });
-    }
 
-    // ✅ Cleanup verification flag
-    await redisClient.del(`verified:${email.toLowerCase()}`);
 
     const existingUser = await User.findOne({
       where: { email: email.toLowerCase() },

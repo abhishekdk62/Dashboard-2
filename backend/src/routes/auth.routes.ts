@@ -1,7 +1,5 @@
 import { Router } from 'express';
 import {
-  sendOtp,
-  verifyOtp,
   completeRegistration,
   login,
   register,
@@ -13,12 +11,10 @@ import { User } from '../models';
 
 const router = Router();
 
-router.post('/send-otp', sendOtp);
 
 
 
 
-router.post('/verify-otp', verifyOtp);
 router.post('/complete-registration', completeRegistration);
 router.post('/login', login);
 router.get('/me',authenticateToken, getMe);
