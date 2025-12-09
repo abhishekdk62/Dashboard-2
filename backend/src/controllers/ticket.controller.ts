@@ -5,17 +5,21 @@ import { io } from '../sockets/ticket.sockets';
 
 
 export const getUserTickets = async (req: Request, res: Response) => {
+  const authReq = req as Request & { user?: { id: number } };
+
   const tickets = await Ticket.findAll({
-    where: { userId: req.user!.id },
+    where: { userId: authReq.user!.id },
     order: [['createdAt', 'DESC']],
   });
   res.json(tickets);
 };
 
 export const createTicket = async (req: Request, res: Response) => {
+  const authReq = req as Request & { user?: { id: number } };
+
   const ticket = await Ticket.create({
     ...req.body,
-    userId: req.user!.id,
+    userId: authReq.user!.id,
   });
 
   io.emit('ticketCreated', ticket);
@@ -23,6 +27,7 @@ export const createTicket = async (req: Request, res: Response) => {
 };
 
 export const getTicket = async (req: Request, res: Response) => {
+  
   const ticket = await Ticket.findByPk(req.params.id, {
     include: [
       {
@@ -67,10 +72,19 @@ export const getAllTickets = async (req: Request, res: Response) => {
 };
 
 export const addComment = async (req: Request, res: Response) => {
+  const authReq = req as Request & { user?: { id: number } };
+
+  const { ticketId } = req.params as { ticketId: string };
+
+  if (!ticketId) {
+    return res.status(400).json({ error: 'ticketId is required' });
+  }
+
   const { content } = req.body;
+
   const comment = await Comment.create({
-    ticketId: +req.params.ticketId,
-    userId: req.user!.id,
+    ticketId: +ticketId,
+    userId: authReq.user!.id,
     content,
   });
 
@@ -78,6 +92,6 @@ export const addComment = async (req: Request, res: Response) => {
     include: [User],
   });
 
-  io.to(`ticket_${req.params.ticketId}`).emit('newComment', fullComment);
+  io.to(`ticket_${ticketId}`).emit('newComment', fullComment);
   res.status(201).json(fullComment);
 };

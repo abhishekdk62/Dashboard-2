@@ -80,11 +80,14 @@ export const login = async (req: Request, res: Response) => {
 };
 
 export const register = async (req: Request, res: Response) => {
+
   await completeRegistration(req as any, res);
 };
 
 export const getMe = async (req: Request, res: Response) => {
-  const user = await User.findByPk(req.user!.id, {
+  const authReq = req as Request & { user?: { id: number } };
+
+  const user = await User.findByPk(authReq.user!.id, {
     attributes: ['id', 'name', 'email', 'role'],
   });
   res.json(user);

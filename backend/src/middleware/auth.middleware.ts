@@ -2,14 +2,23 @@ import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import { User } from '../models';
 
+type AuthRequest = Request & {
+  user?: {
+    id: number | string;
+    email?: string;
+    role?: string;
+  };
+};
 
 export const authenticateToken = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
+  const authReq = req as AuthRequest;
+
   try {
-    const token = req.cookies.token;
+    const token = authReq.cookies.token;
     if (!token) {
       return res.status(401).json({ error: 'Access denied. No token provided.' });
     }
@@ -20,7 +29,7 @@ export const authenticateToken = async (
       return res.status(401).json({ error: 'Invalid token.' });
     }
 
-    req.user = { id: user.id, email: user.email, role: user.role };
+    authReq.user = { id: user.id, email: user.email, role: user.role };
     next();
   } catch (error) {
     res.status(401).json({ error: 'Invalid token.' });
@@ -32,7 +41,9 @@ export const requireAdmin = (
   res: Response,
   next: NextFunction
 ) => {
-  if (req.user?.role !== 'admin') {
+  const authReq = req as AuthRequest;
+
+  if (authReq.user?.role !== 'admin') {
     return res.status(403).json({ error: 'Admin access required.' });
   }
   next();
